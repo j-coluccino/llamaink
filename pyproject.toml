@@ -1,0 +1,51 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "llamaink"
+version = "0.1.0"
+description = "Privacy-first DBT documentation generator using local LLMs"
+readme = "README.md"
+requires-python = ">=3.8"
+license = {text = "MIT"}
+authors = [
+    {name = "Jacopo Coluccino", email = "jacopo.coluccino@gmail.com"}
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+]
+dependencies = [
+    "requests>=2.25.0",
+    "tqdm>=4.60.0",
+]
+
+[project.optional-dependencies]
+llm = ["llama-cpp-python>=0.3.8"]
+dev = ["pytest>=6.0.0", "black>=22.0.0", "flake8>=4.0.0"]
+
+[project.scripts]
+llamaink = "llamaink.cli:main"
+
+[project.urls]
+"Homepage" = "https://github.com/j-coluccino/llamaink"
+"Bug Tracker" = "https://github.com/j-coluccino/llamaink/issues"
+
+[tool.setuptools]
+packages = ["llamaink"]
+
+[tool.black]
+line-length = 88
+target-version = ["py38"]
+include = '\.pyi?$'
+
+[tool.isort]
+profile = "black"
+line_length = 88
