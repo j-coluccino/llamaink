@@ -2,7 +2,7 @@
 
 <div align="center">
   
-![LlamaInk Logo](https://raw.githubusercontent.com/j-coluccino/llamaink/main/assets/llamaink_logo.png)
+  <img src="https://github.com/user-attachments/assets/62bcfd40-53cc-4019-aea7-fd2591c7ea1d" width=30% height=30%>
 
 </div>
 
@@ -15,6 +15,10 @@
 LlamaInk is a tool for automatically generating comprehensive documentation for DBT models in data engineering repositories. Unlike cloud-based solutions, LlamaInk runs entirely locally, ensuring your proprietary code never leaves your machine.
 
 Here is a quick video of LlamaInk in action:
+
+<video src="https://github.com/user-attachments/assets/5a2d920a-ebed-4d81-b6ba-02f4a1e11dc9" controls="controls" style="max-width: 730px;">
+</video>
+
 
 ### Key Features
 
