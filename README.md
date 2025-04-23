@@ -14,7 +14,7 @@
 
 LlamaInk is a tool for automatically generating comprehensive documentation for DBT models in data engineering repositories. Unlike cloud-based solutions, LlamaInk runs entirely locally, ensuring your proprietary code never leaves your machine.
 
-Here is a quick video of LlamaInk in action:
+Here is a quick video of LlamaInk in action on the following public dbt repo: [simple_dbt_project](https://github.com/josephmachado/simple_dbt_project).
 
 <video src="https://github.com/user-attachments/assets/5a2d920a-ebed-4d81-b6ba-02f4a1e11dc9" controls="controls" style="max-width: 730px;">
 </video>
