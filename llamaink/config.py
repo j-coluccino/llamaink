@@ -15,6 +15,7 @@ class LlamaInkConfig:
     context_size: int = 8192
     use_gpu: bool = True
     llama_binary_path: str = ""
+    max_tokens: int = 4096
 
     exclude_patterns: List[str] = field(
         default_factory=lambda: [

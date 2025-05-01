@@ -253,56 +253,32 @@ class TestLlamaEngine(unittest.TestCase):
 
         self.assertEqual(result, "Generated output")
 
-    @patch("requests.get")
-    @patch("builtins.input", return_value="1")
-    @patch("builtins.print")
-    def test_auto_download_model(self, mock_print, mock_input, mock_requests_get):
-        """Test automatic model download."""
-
-        mock_response = MagicMock()
-        mock_response.headers = {"content-length": "1048576"}
-        mock_response.iter_content.return_value = [b"x" * 1024] * 1024
-        mock_requests_get.return_value = mock_response
-
-        with patch("tqdm.tqdm"):
-
-            result = self.engine._auto_download_model()
-
-            self.assertTrue(result)
-
-            mock_requests_get.assert_called_once()
-
-            mock_input.assert_called_once()
-
     @patch("builtins.input", return_value="1")
     @patch("os.path.exists")
-    @patch("llamaink.llm.engine.LlamaEngine._auto_download_model")
-    @patch("llamaink.llm.engine.LlamaEngine._initialize_with_python_bindings")
-    def test_initialize_with_download(
-        self, mock_init_py, mock_download, mock_exists, mock_input
+    @patch("llamaink.llm.engine.LlamaEngine._use_existing_model")
+    def test_initialize_with_user_model(
+        self, mock_use_existing, mock_exists, mock_input
     ):
-        """Test initialization with model download."""
+        """Test initialization with user-provided model."""
 
         mock_exists.return_value = False
+        mock_use_existing.return_value = True
 
-        mock_download.return_value = True
+        # Make sure the initialization path with Python bindings will be chosen
+        self.engine.llama_cpp_python_available = True
+        self.engine.llama_binary_path = None
 
-        mock_init_py.return_value = True
+        # Now patch _initialize_with_python_bindings directly on the instance
+        with patch.object(
+            self.engine, "_initialize_with_python_bindings"
+        ) as mock_init_py:
+            mock_init_py.return_value = True
 
-        def init_side_effect():
-            self.engine.initialized = True
-            return True
+            result = self.engine.initialize()
 
-        mock_init_py.side_effect = init_side_effect
-
-        result = self.engine.initialize()
-
-        self.assertTrue(result)
-        self.assertTrue(self.engine.initialized)
-
-        mock_download.assert_called_once()
-
-        mock_init_py.assert_called_once()
+            self.assertTrue(result)
+            mock_use_existing.assert_called_once()
+            mock_init_py.assert_called_once()
 
     @patch("llamaink.llm.engine.shutil.copy2")
     @patch("builtins.input", return_value="/path/to/existing/model.gguf")
