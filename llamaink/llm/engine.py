@@ -12,7 +12,10 @@ logger = logging.getLogger(__name__)
 
 DEFAULT_MODEL_NAME: str = "Meta-Llama-3-8B-Instruct.Q2_K.gguf"
 MODEL_URLS: Dict[str, str] = {
-    "Meta-Llama-3-8B-Instruct.Q2_K.gguf": "https://huggingface.co/TheBloke/Llama-3-8B-Instruct-GGUF/resolve/main/llama-3-8b-instruct.Q2_K.gguf",
+    # Small low-quality model for testing or machines with limited resources. Not recommended for production.
+    "Meta-Llama-3-8B-Instruct.Q2_K.gguf": "https://huggingface.co/bartowski/Meta-Llama-3-8B-Instruct-GGUF",
+    # High quality model for general use. Recommended for most applications.
+    "Llama-3.2-3B-Instruct-Q8_0.gguf": "https://huggingface.co/bartowski/Llama-3.2-3B-Instruct-GGUF",
 }
 
 
@@ -31,6 +34,7 @@ class LlamaEngine:
         use_gpu: bool = True,
         threads: Optional[int] = None,
         verbose: bool = False,
+        config: Optional[Any] = None,
     ) -> None:
         """
         Initialize the LLM engine.
@@ -41,6 +45,7 @@ class LlamaEngine:
             use_gpu: Whether to use GPU acceleration if available
             threads: Number of CPU threads to use, or None for auto-detection
             verbose: Whether to print verbose output
+            config: Optional config object with additional parameters
         """
         self.model_path: str = model_path or self._get_default_model_path()
         self.context_size: int = context_size
@@ -49,6 +54,7 @@ class LlamaEngine:
         self.verbose: bool = verbose
         self.initialized: bool = False
         self.llm: Any = None
+        self.config = config
 
         self.llama_binary_path: Optional[str] = self._find_llama_binary()
         self.llama_cpp_python_available: bool = self._check_llama_cpp_python()
@@ -528,93 +534,20 @@ class LlamaEngine:
         print("=" * 80)
         print("LlamaInk requires a quantized Llama model to work.")
         print("\nOptions:")
-        print("1. Download a model automatically")
-        print("2. Provide a path to an existing model")
-        print("3. Abort setup")
+        print("1. Provide a path to an existing model")
+        print("2. Abort setup")
         print("=" * 80)
 
         while True:
-            choice = input("Choose an option (1-3): ").strip()
+            choice = input("Choose an option (1-2): ").strip()
 
             if choice == "1":
-                return self._auto_download_model()
-            elif choice == "2":
                 return self._use_existing_model()
-            elif choice == "3":
+            elif choice == "2":
                 print("Setup aborted.")
                 return False
             else:
-                print("Invalid choice. Please enter 1, 2, or 3.")
-
-    def _auto_download_model(self) -> bool:
-        """
-        Automatically download a model from a predefined source.
-
-        Returns:
-            True if download was successful, False otherwise
-        """
-        try:
-            try:
-                import requests
-                from tqdm import tqdm
-            except ImportError:
-                print("Required packages missing. Installing requests and tqdm...")
-                subprocess.check_call(
-                    [sys.executable, "-m", "pip", "install", "requests", "tqdm"]
-                )
-                import requests
-                from tqdm import tqdm
-
-            print("\nAvailable models:")
-            for i, model_name in enumerate(MODEL_URLS.keys(), 1):
-                print(f"{i}. {model_name}")
-
-            choice = input(
-                f"Select a model (1-{len(MODEL_URLS)}), or press Enter for default: "
-            )
-
-            if not choice.strip():
-                selected_model = DEFAULT_MODEL_NAME
-            else:
-                try:
-                    idx = int(choice) - 1
-                    model_keys = list(MODEL_URLS.keys())
-                    if idx < 0 or idx >= len(model_keys):
-                        print("Invalid selection. Using default model.")
-                        selected_model = DEFAULT_MODEL_NAME
-                    else:
-                        selected_model = model_keys[idx]
-                except (ValueError, IndexError):
-                    print("Invalid selection. Using default model.")
-                    selected_model = DEFAULT_MODEL_NAME
-
-            url = MODEL_URLS[selected_model]
-            target_path = os.path.join(os.path.dirname(self.model_path), selected_model)
-
-            print(f"Downloading {selected_model}...")
-            print(f"This may take a while depending on your internet connection.")
-
-            response = requests.get(url, stream=True)
-            total_size = int(response.headers.get("content-length", 0))
-
-            with open(target_path, "wb") as f, tqdm(
-                desc=selected_model,
-                total=total_size,
-                unit="B",
-                unit_scale=True,
-                unit_divisor=1024,
-            ) as bar:
-                for data in response.iter_content(chunk_size=1024 * 1024):
-                    size = f.write(data)
-                    bar.update(size)
-
-            self.model_path = target_path
-            print(f"Model downloaded successfully to: {target_path}")
-            return True
-
-        except Exception as e:
-            print(f"Error downloading model: {str(e)}")
-            return False
+                print("Invalid choice. Please enter 1 or 2.")
 
     def _use_existing_model(self) -> bool:
         """

@@ -55,7 +55,16 @@ class DBTDocumentationGenerator:
             logger.debug(
                 f"Prompt for DBT documentation can be found in {os.path.join(repo_path, 'prompt.txt')}"
             )
-        dbt_docs = self.llm_engine.generate(prompt)
+
+        # Get max_tokens from the engine config
+        max_tokens = getattr(self.llm_engine, "config", None)
+        if max_tokens is None:
+            max_tokens = 4096
+        else:
+            max_tokens = getattr(max_tokens, "max_tokens", 4096)
+
+        logger.info(f"Generating documentation with max_tokens={max_tokens}")
+        dbt_docs = self.llm_engine.generate(prompt, max_tokens=max_tokens)
 
         # Ensure the disclaimer is added to the documentation
         if not any(

@@ -85,11 +85,18 @@ def setup_argparser() -> argparse.ArgumentParser:
         "--context-size", type=int, help="Context size for the model (overrides config)"
     )
 
+    model_group.add_argument(
+        "--max-tokens",
+        type=int,
+        default=4096,
+        help="Maximum number of tokens to generate (default: 4096)",
+    )
+
     setup_group = parser.add_argument_group("Setup and Configuration")
     setup_group.add_argument(
         "--init",
         action="store_true",
-        help="Initialize LlamaInk (download models, setup config)",
+        help="Initialize LlamaInk (setup config, etc.)",
     )
     setup_group.add_argument("--config", "-c", help="Path to custom configuration file")
     setup_group.add_argument(
@@ -363,6 +370,8 @@ def main() -> int:
         config.use_gpu = False
     if args.context_size:
         config.context_size = args.context_size
+    if args.max_tokens:
+        config.max_tokens = args.max_tokens
     if args.output:
         config.output_dir = args.output
 
@@ -419,7 +428,7 @@ def main() -> int:
             logger.error(f"Model not found: {config.model_path}")
             print(f"\nError: Model not found at {config.model_path}")
             print(
-                "Run 'llamaink --init' to download a model or specify a model with --model"
+                "Run 'llamaink --init' to setup config or specify a model with --model"
             )
             return 1
 
@@ -439,6 +448,7 @@ def main() -> int:
             context_size=config.context_size,
             use_gpu=config.use_gpu,
             verbose=args.verbose or args.debug,
+            config=config,
         )
 
         if not engine.initialize():

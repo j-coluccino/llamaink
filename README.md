@@ -69,6 +69,9 @@ llamaink --repo . --output docs/generated
 
 # Use a different model
 llamaink --repo . --model /path/to/your/model.gguf
+
+# Control the maximum output size
+llamaink --repo . --max-tokens 2048
 ```
 
 ### Command Line Options
@@ -86,6 +89,7 @@ Model Options:
   --model, -m             Path to the Llama model (overrides config)
   --cpu-only              Force CPU-only mode, even if GPU is available
   --context-size          Context size for the model (overrides config)
+  --max-tokens            Maximum number of tokens to generate (default: 4096)
 
 Setup and Configuration:
   --init                  Initialize LlamaInk (download models, setup config)
@@ -110,6 +114,7 @@ Example configuration:
 {
   "model_path": "/path/to/your/model.gguf",
   "context_size": 8192,
+  "max_tokens": 4096,
   "use_gpu": true,
   "output_dir": "docs",
   "exclude_patterns": [
@@ -121,20 +126,29 @@ Example configuration:
 }
 ```
 
-## 🖥️ Supported Models
+## 🖥️ Model Setup
 
-LlamaInk works with quantized Llama models in GGUF format. Recommended models include:
+LlamaInk requires a quantized Llama model in GGUF format to function. Please follow these steps to set up a model:
 
-- **Meta-Llama-3-8B-Instruct (Q2_K)**: Fast, efficient model for most documentation needs (default and only one tested)
+1. Visit Hugging Face to download a compatible model:
+   - [Llama-3.2-3B-Instruct-Q8_0.gguf](https://huggingface.co/bartowski/Llama-3.2-3B-Instruct-GGUF)
+   - The above is a recommended model for better quality output. Feel free to try other models as well.
 
-When using `--init`, you'll be guided through downloading a compatible model.
+2. Download the model file manually (e.g., `Llama-3.2-3B-Instruct-Q8_0.gguf`)
+
+3. When running LlamaInk for the first time, you'll be prompted to provide the path to your downloaded model.
+
+4. Alternatively, specify the model path directly with the `--model` flag:
+   ```bash
+   llamaink --repo . --model /path/to/your/model.gguf
+   ```
 
 ## 🔄 How It Works
 
 1. **Repository Scanning**: LlamaInk analyzes your repository to identify DBT models, schemas, and configurations
 2. **Context Collection**: The tool collects relevant information from your DBT files
 3. **Documentation Generation**: A local LLM processes the context and generates comprehensive documentation
-4. **Output**: Generates Markdown files with model documentation, relationships, and lineage
+4. **Output**: Generates Markdown files with model descriptions, relationships, and lineage
 
 ## 📊 Example Outputs
 
