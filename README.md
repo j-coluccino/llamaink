@@ -92,7 +92,7 @@ Model Options:
   --max-tokens            Maximum number of tokens to generate (default: 4096)
 
 Setup and Configuration:
-  --init                  Initialize LlamaInk (download models, setup config)
+  --init                  Initialize LlamaInk (setup config)
   --config, -c            Path to custom configuration file
   --check-model           Check model compatibility without generating documentation
 
